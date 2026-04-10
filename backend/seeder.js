@@ -31,6 +31,56 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
   ]);
   console.log('🛏️  Rooms created');
 
+  // Bookings
+  const john = await db.collection('users').findOne({ email: 'john@example.com' });
+  const admin = await db.collection('users').findOne({ email: 'admin@luxuryhotel.com' });
+  const allRooms = await db.collection('rooms').find().toArray();
+
+  if (john && allRooms.length > 2) {
+    await db.collection('bookings').insertMany([
+      {
+        user: john._id,
+        room: allRooms[0]._id,
+        checkIn: new Date(Date.now() + 86400000 * 2), // 2 days from now
+        checkOut: new Date(Date.now() + 86400000 * 5),
+        guests: 2,
+        totalPrice: allRooms[0].price * 3,
+        status: 'confirmed',
+        paymentMethod: 'Credit Card',
+        paymentStatus: 'completed',
+        specialRequests: 'High floor if possible',
+        createdAt: new Date()
+      },
+      {
+        user: admin._id,
+        room: allRooms[1]._id,
+        checkIn: new Date(Date.now() + 86400000 * 10), // 10 days from now
+        checkOut: new Date(Date.now() + 86400000 * 12),
+        guests: 1,
+        totalPrice: allRooms[1].price * 2,
+        status: 'pending',
+        paymentMethod: 'PayPal',
+        paymentStatus: 'unpaid',
+        specialRequests: 'None',
+        createdAt: new Date()
+      },
+      {
+        user: john._id,
+        room: allRooms[2]._id,
+        checkIn: new Date(Date.now() - 86400000 * 5), // 5 days ago
+        checkOut: new Date(Date.now() - 86400000 * 2), // 2 days ago
+        guests: 2,
+        totalPrice: allRooms[2].price * 3,
+        status: 'confirmed', // Assuming past bookings stick with 'confirmed' or 'completed'
+        paymentMethod: 'Debit Card',
+        paymentStatus: 'completed',
+        specialRequests: 'Extra towels',
+        createdAt: new Date(Date.now() - 86400000 * 10)
+      }
+    ]);
+    console.log('📅 Bookings created');
+  }
+
   console.log('========================================');
   console.log('✅ DONE!');
   console.log('Admin → admin@luxuryhotel.com / admin123');
