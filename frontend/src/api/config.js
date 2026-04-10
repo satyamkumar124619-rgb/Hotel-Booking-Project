@@ -2,7 +2,7 @@ import axios from 'axios';
 import storage from './storageManager';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://hotel-booking-project-uo5r.onrender.com/api',
 });
 
 API.interceptors.request.use((config) => {
